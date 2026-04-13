@@ -28,8 +28,9 @@ The trained model is then used to predict the sentiment of unseen data. The perf
 
 Finally, the model is tested with custom input sentences to demonstrate its practical use. Users can input any sentence, and the model will predict whether the sentiment is positive, negative, or neutral. This shows how sentiment analysis can be applied in real-life scenarios such as analyzing customer feedback, monitoring brand reputation, or understanding public opinion.
 
-**OUTPUT**
-
-
 
 In conclusion, this project successfully demonstrates the implementation of sentiment analysis using NLP techniques and machine learning. It highlights the importance of data preprocessing, feature extraction, and model evaluation. The project can be further improved by using larger datasets, advanced models like Naive Bayes or Support Vector Machines, or even deep learning techniques for better accuracy and performance.
+
+**OUTPUT**
+
+![Image](https://github.com/user-attachments/assets/82545763-3a0b-4843-a564-e67462b166c3)
