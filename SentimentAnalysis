@@ -1,0 +1,123 @@
+# ================================
+# SENTIMENT ANALYSIS 
+# ================================
+
+# Install libraries
+!pip install nltk scikit-learn seaborn
+
+# Import libraries
+import pandas as pd
+import numpy as np
+import re
+import nltk
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+from nltk.corpus import stopwords
+from nltk.stem import PorterStemmer
+
+from sklearn.model_selection import train_test_split
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.linear_model import LogisticRegression
+from sklearn.metrics import accuracy_score, classification_report, confusion_matrix
+
+# Download NLTK data
+nltk.download('stopwords')
+
+# ================================
+# DATASET
+# ================================
+data = {
+    'text': [
+        "I love this product",
+        "This is the worst experience",
+        "Amazing service and friendly staff",
+        "I am very disappointed",
+        "It was okay, not great",
+        "Excellent quality and fast delivery",
+        "Bad product, waste of money",
+        "I really enjoyed this",
+        "Horrible experience, never again",
+        "It is average"
+    ],
+    'sentiment': [
+        'positive', 'negative', 'positive', 'negative', 'neutral',
+        'positive', 'negative', 'positive', 'negative', 'neutral'
+    ]
+}
+
+df = pd.DataFrame(data)
+
+# ================================
+# PREPROCESSING
+# ================================
+ps = PorterStemmer()
+stop_words = set(stopwords.words('english'))
+
+def clean_text(text):
+    text = text.lower()
+    text = re.sub('[^a-zA-Z]', ' ', text)
+    words = text.split()
+    words = [ps.stem(word) for word in words if word not in stop_words]
+    return ' '.join(words)
+
+df['clean_text'] = df['text'].apply(clean_text)
+
+# ================================
+# FEATURE EXTRACTION (TF-IDF)
+# ================================
+vectorizer = TfidfVectorizer()
+X = vectorizer.fit_transform(df['clean_text'])
+y = df['sentiment']
+
+# ================================
+# TRAIN TEST SPLIT
+# ================================
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y, test_size=0.2, random_state=42
+)
+
+# ================================
+# MODEL TRAINING
+# ================================
+model = LogisticRegression()
+model.fit(X_train, y_train)
+
+# ================================
+# PREDICTION
+# ================================
+y_pred = model.predict(X_test)
+
+print("Accuracy:", accuracy_score(y_test, y_pred))
+print("\nClassification Report:\n", classification_report(y_test, y_pred))
+
+# ================================
+# CONFUSION MATRIX
+# ================================
+cm = confusion_matrix(y_test, y_pred)
+
+sns.heatmap(cm, annot=True, fmt='d')
+plt.title("Confusion Matrix")
+plt.xlabel("Predicted")
+plt.ylabel("Actual")
+plt.show()
+
+# ================================
+# SENTIMENT DISTRIBUTION
+# ================================
+sns.countplot(x='sentiment', data=df)
+plt.title("Sentiment Distribution")
+plt.show()
+
+# ================================
+# CUSTOM INPUT TEST
+# ================================
+def predict_sentiment(text):
+    text = clean_text(text)
+    vector = vectorizer.transform([text])
+    return model.predict(vector)[0]
+
+print("\nCustom Predictions:")
+print("I love this phone ->", predict_sentiment("I love this phone"))
+print("This is very bad ->", predict_sentiment("This is very bad"))
+print("It is okay ->", predict_sentiment("It is okay"))
